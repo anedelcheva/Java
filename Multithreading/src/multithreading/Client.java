@@ -15,14 +15,8 @@ public class Client {
 	private Socket socket;
 	private String username;
 	
-	public Client() {
-		try {
-			socket = new Socket(HOSTNAME, SERVER_PORT);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public Client(Socket socket) {
+		this.socket = socket;
 		this.setUsername(java.lang.management.ManagementFactory.getRuntimeMXBean().getName());
 	}
 	
@@ -67,10 +61,45 @@ public class Client {
 		}
 		return response;
 	}
+	
+	private void retryToConnect() {
+		while(!isServerActive()) {
+			try {
+				Thread.sleep(900);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			try {
+				this.socket = new Socket(HOSTNAME, SERVER_PORT);
+				@SuppressWarnings("unused")
+				PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void sendMessageToServer(PrintWriter out, String message) {
+		if(isServerActive())
+			sendToServer(out, message);
+		else {
+			retryToConnect();
+			sendMessageToServer(out, message);
+		}
+	}
 
 	public static void main(String[] args) {
-		
-		Client client = new Client();
+		Socket socket = null;
+		try {
+			socket = new Socket(HOSTNAME, SERVER_PORT);
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Client client = new Client(socket);
 		System.out.println("Client with username " + client.getUsername() + " connected to server");
 		
 		// we send the client's username to the server
@@ -81,6 +110,7 @@ public class Client {
 			sendToServer(out, client.getUsername());
 			System.out.print(answerFromServer(reader));
 			String message = scanner.nextLine();
+			//client.sendMessageToServer(out, message);
 			sendToServer(out, message);
 			
 		} catch (IOException e) {

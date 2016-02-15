@@ -30,7 +30,7 @@ public class Logger implements LoggerInterface {
 	}
 
 	@Override
-	public void log(String username, String msg) throws IOException {
+	public /*synchronized*/ void log(String username, String msg) throws IOException {
 		Calendar now = Calendar.getInstance();
 		String currentTime = Logger.tsFormat.format(now.getTime());
 		this.logFileWriter.println(currentTime + " [" + username + "]: " + msg);

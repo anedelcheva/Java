@@ -13,20 +13,16 @@ public class Client {
 	private static final int SERVER_PORT = 10000;
 	private static final String HOSTNAME = "localhost";
 	private Socket socket;
-	private String username;
+	private String clientID;
 	
-	public Client(Socket socket) {
-		this.socket = socket;
-		this.setUsername(java.lang.management.ManagementFactory.getRuntimeMXBean().getName());
+	public Client() throws UnknownHostException, IOException {
+		this.socket = new Socket(HOSTNAME, SERVER_PORT);
+		this.setClientID(java.lang.management.ManagementFactory.getRuntimeMXBean().getName());
 	}
 	
 	public Socket getSocket() {
 		return socket;
 	}
-
-	/*public void setSocket(Socket socket) {
-		this.socket = socket;
-	}*/
 	
 	public static boolean isServerActive() {
 		try(Socket s = new Socket(HOSTNAME, SERVER_PORT)) {
@@ -39,12 +35,12 @@ public class Client {
 		return false;
 	}
 	
-	public String getUsername() {
-		return username;
+	public String getClientID() {
+		return clientID;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setClientID(String username) {
+		this.clientID = username;
 	}
 	
 	private static void sendToServer(PrintWriter out, String message) {
@@ -81,6 +77,7 @@ public class Client {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void sendMessageToServer(PrintWriter out, String message) {
 		if(isServerActive())
 			sendToServer(out, message);
@@ -89,32 +86,22 @@ public class Client {
 			sendMessageToServer(out, message);
 		}
 	}
-
-	public static void main(String[] args) {
-		Socket socket = null;
-		try {
-			socket = new Socket(HOSTNAME, SERVER_PORT);
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		Client client = new Client(socket);
-		System.out.println("Client with username " + client.getUsername() + " connected to server");
-		
-		// we send the client's username to the server
-		try(PrintWriter out = new PrintWriter(client.getSocket().getOutputStream());
+	
+	public void start() throws IOException {
+		System.out.println("Client with username " + this.getClientID() + " connected to server");
+		try(PrintWriter out = new PrintWriter(this.getSocket().getOutputStream());
 				Scanner scanner = new Scanner(System.in);
 				BufferedReader reader = 
-					new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()))) {
-			sendToServer(out, client.getUsername());
+					new BufferedReader(new InputStreamReader(this.getSocket().getInputStream()))) {
+			sendToServer(out, this.clientID);
 			System.out.print(answerFromServer(reader));
 			String message = scanner.nextLine();
-			//client.sendMessageToServer(out, message);
 			sendToServer(out, message);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
-}
+	
+	public static void main(String[] args) throws UnknownHostException, IOException {
+		Client client = new Client();
+		client.start();
+		}
+	}

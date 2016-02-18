@@ -21,25 +21,27 @@ public class Tests {
 		logger = new Logger(path);
 		Thread thread1 = new Thread() {
 			public void run() {
-				try {
-					logger.log("Aneta", "This is Aneta's testaaaaaaaaaa");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				logger.log("Aneta", "This is Aneta's testaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 			}
 		};
 		Thread thread2 = new Thread() {
 			public void run() {
-				try {
-					logger.log("Ivan", "This is Ivan's testwwwwwwwwwwwwwwwwwwwwwww");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				logger.log("Ivan", "This is Ivan's testwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 			}
 		};
 		
+		
+		Thread thread3 = new Thread() {
+			public void run() {
+				logger.log("Ivan", "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
+			}
+		};
+		
+		
+		
 		thread1.start();
 		thread2.start();
+		thread3.start();
 	}
 	
 	@Test

@@ -76,7 +76,6 @@ public class MultiThreadedServer implements Runnable {
 		socket = serverSocket.accept();
 	}
 	
-	//for a testing purpose
 	public static void acceptANewConnection(Socket socket, Logger logger) 
 			throws IOException {
 		new Thread(new MultiThreadedServer(socket, logger)).start();
@@ -88,7 +87,6 @@ public class MultiThreadedServer implements Runnable {
 		while(serverIsActive) {
 			Socket socket = serverSocket.accept();
 			acceptANewConnection(socket, logger);
-			//closeConnectionToServer();
 		}
 	}
 	

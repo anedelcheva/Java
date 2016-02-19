@@ -24,16 +24,16 @@ public class Client {
 		return socket;
 	}
 	
-	public static boolean isServerActive() {
-		try(Socket s = new Socket(HOSTNAME, SERVER_PORT)) {
-			return true;
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+//	public static boolean isServerActive() {
+//		try(Socket s = new Socket(HOSTNAME, SERVER_PORT)) {
+//			return true;
+//		} catch (UnknownHostException e) {
+//			//e.printStackTrace();
+//		} catch (IOException e) {
+//			//e.printStackTrace();
+//		}
+//		return false;
+//	}
 	
 	public String getClientID() {
 		return clientID;
@@ -58,34 +58,31 @@ public class Client {
 		return response;
 	}
 	
-	private void retryToConnect() {
-		while(!isServerActive()) {
-			try {
-				Thread.sleep(900);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			try {
-				this.socket = new Socket(HOSTNAME, SERVER_PORT);
-				@SuppressWarnings("unused")
-				PrintWriter out = new PrintWriter(this.socket.getOutputStream());
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	private void retryToConnect(PrintWriter out, BufferedReader reader) {
+//		while(!isServerActive()) {
+//			int i = 0;
+//			try {
+//				this.socket = new Socket(HOSTNAME, SERVER_PORT);
+//				out = new PrintWriter(this.getSocket().getOutputStream());
+//				reader = new BufferedReader(new InputStreamReader(this.getSocket().getInputStream()));
+//				
+//			} catch (UnknownHostException e) {
+//				//e.printStackTrace();
+//			} catch (IOException e) {
+//				//e.printStackTrace();
+//			}
+//			System.out.println("Reconnect:" + i++);
+//		}
+//	}
 	
-	@SuppressWarnings("unused")
-	private void sendMessageToServer(PrintWriter out, String message) {
-		if(isServerActive())
-			sendToServer(out, message);
-		else {
-			retryToConnect();
-			sendMessageToServer(out, message);
-		}
-	}
+//	private void sendMessageToServer(PrintWriter out, String message) {
+//		if(isServerActive())
+//			sendToServer(out, message);
+//		else {
+//			retryToConnect();
+//			sendMessageToServer(out, message);
+//		}
+//	}
 	
 	public void start() throws IOException {
 		System.out.println("Client with username " + this.getClientID() + " connected to server");
@@ -94,9 +91,20 @@ public class Client {
 				BufferedReader reader = 
 					new BufferedReader(new InputStreamReader(this.getSocket().getInputStream()))) {
 			sendToServer(out, this.clientID);
-			System.out.print(answerFromServer(reader));
-			String message = scanner.nextLine();
-			sendToServer(out, message);
+			
+			String message = "";
+			while (!message.equals("quit")) {
+				String message2 = answerFromServer(reader);
+				if (message2 != null) {
+					System.out.print(message2);
+				} else {
+					System.out.print("Send your message: ");
+				}
+				
+				message = scanner.nextLine();
+				sendToServer(out, message);
+			}
+			
 		}
 	}
 	

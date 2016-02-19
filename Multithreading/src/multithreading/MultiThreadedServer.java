@@ -59,15 +59,15 @@ public class MultiThreadedServer implements Runnable {
 		return serverIsActive = false;
 	}
 	
-	public static void startServerWith(Socket socket) throws IOException {
+	/*public static void startServerWith(Socket socket) throws IOException {
 		Logger logger = new Logger(PATH);
 		serverSocket = new ServerSocket(SERVER_PORT);
 		while(serverIsActive) {
 			socket = serverSocket.accept();
 			acceptANewConnection(socket, logger);
-			//closeConnectionToServer();
+			closeConnectionToServer();
 		}
-	}
+	}*/
 	
 	@SuppressWarnings("resource")
 	public static void receiveConnectionFromClient(ServerSocket serverSocket, Socket socket) 
@@ -82,11 +82,16 @@ public class MultiThreadedServer implements Runnable {
 	}
 	
 	public static void startServer() throws IOException {
-		Logger logger = new Logger(PATH);
-		serverSocket = new ServerSocket(SERVER_PORT);
-		while(serverIsActive) {
-			Socket socket = serverSocket.accept();
-			acceptANewConnection(socket, logger);
+		try(Logger logger = new Logger(PATH)) {
+			serverSocket = new ServerSocket(SERVER_PORT);
+			while(serverIsActive) {
+				Socket socket = serverSocket.accept();
+				acceptANewConnection(socket, logger);
+				
+	
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -133,10 +138,19 @@ public class MultiThreadedServer implements Runnable {
 						new BufferedReader(new InputStreamReader(getSocket().getInputStream()))) {
 			setUsername(answerFromClient(reader));
 			System.out.println("Client with username " + username + " connected");
-			sendToClient(out, "Send your message: ");
-			String message = answerFromClient(reader);
-			System.out.println("Message from client " + username + " is: \"" + message + "\"");
-			getLogger().log(username, message);
+			
+			String message = "";
+			while (!message.equals("quit")&&serverIsActive) {
+				sendToClient(out, "Send your message: ");
+				message = answerFromClient(reader);
+
+				System.out.println("Message from client " + username + " is: \"" + message + "\"");
+				getLogger().log(username, message);
+				if (message.equals("turn off")) {
+					closeConnectionToServer();
+				}
+			}
+			
 		}
 		catch (IOException e) {
 			e.printStackTrace();

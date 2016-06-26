@@ -4,4 +4,4 @@ The Huffman Compression Algorithm is not implemented fully. JobSplitter.java con
 
         $ java JobSplitter -f <filepath> -t[|-tasks|tasks] <number_of_threads> [-q|-quiet|quiet]
     
-JobSplitter can be run with N number of threads if a machine has N cores. There is a speedup in time up to 6-7 number of threads. A file is read to a string and the filecontent of the string is split to an array of strings where the array has length <number_of_threads>. Then every thread calculates a frequency table for a part if the file. The results from the different threads are merged to a common frequency table.
+JobSplitter can be run with N number of threads if a machine has N cores. There is a speedup in time up to 6-7 number of threads. A file is read to a string and the filecontent of the string is split to an array of strings where the array has length number_of_threads. Then every thread calculates a frequency table for a part if the file. The results from the different threads are merged to a common frequency table.
